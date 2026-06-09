@@ -338,11 +338,11 @@ export default function App() {
             {/* Logo Mark */}
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-md shadow border border-indigo-500">
-                L
+                S
               </div>
               <div>
                 <span className="text-sm font-bold text-white tracking-tight block font-sans">
-                  Lead Track Hub
+                  Sukafa Enterprise
                 </span>
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block font-mono">
                   {currentUser.role === UserRole.Admin && 'System Director Panel'}
@@ -384,10 +384,6 @@ export default function App() {
         
         {/* NAV WORKSPACE NAVIGATION MENU (SIDEBAR) */}
         <aside className="w-full lg:w-64 flex-shrink-0 flex flex-col gap-2">
-          
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 mb-2 font-mono">
-            Portal Operations
-          </div>
 
           {currentUser.role !== UserRole.Admin && (
             <button
@@ -471,15 +467,17 @@ export default function App() {
           )}
 
           {/* QUICK CREDENTIALS TOUR INFORMATION BLOCK */}
-          <div className="mt-8 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-xs font-semibold text-indigo-700 text-left space-y-2">
-            <h4 className="flex items-center space-x-1 uppercase text-[10px] tracking-wider font-bold">
-              <Database className="w-3.5 h-3.5" />
-              <span>Durable Local Engine</span>
-            </h4>
-            <p className="text-slate-500 font-medium leading-relaxed">
-              Every data creation, password reset, log notation and document attachment is saved immediately inside local storage persistence. Mock lists are seeded automatically.
-            </p>
-          </div>
+          {currentUser.role !== UserRole.Agent && (
+            <div className="mt-8 bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-xs font-semibold text-indigo-700 text-left space-y-2">
+              <h4 className="flex items-center space-x-1 uppercase text-[10px] tracking-wider font-bold">
+                <Database className="w-3.5 h-3.5" />
+                <span>Durable Local Engine</span>
+              </h4>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Every data creation, password reset, log notation and document attachment is saved immediately inside local storage persistence. Mock lists are seeded automatically.
+              </p>
+            </div>
+          )}
 
         </aside>
 
@@ -488,267 +486,80 @@ export default function App() {
           
           {/* TAB: LEADS VIEW CONTROL SCREEN */}
           {selectedTab === 'leads' && (
-            <div className="space-y-6 flex flex-col h-full text-left">
-              
-              {/* HEADING PANEL */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-5 gap-4">
-                <div>
-                  <h2 className="text-xl font-bold font-sans tracking-tight text-slate-950">Customer Inquiries Directory</h2>
-                  <p className="text-xs font-semibold text-slate-400 mt-1">
-                    {currentUser.role === UserRole.Admin && 'Admin controls: Monitor conversion cycles, delegate portfolios, update billing rates, and launch reports.'}
-                    {currentUser.role === UserRole.Employee && 'Processor controls: Review assigned applicants, upload vetting files, update stages, and write remarks.'}
-                    {currentUser.role === UserRole.Agent && 'Referral controls: Track payouts, review conversion statuses, check remarks, or submit new cases.'}
-                  </p>
-                </div>
-
-                {/* Submitting lead trigger button (accessible to Admin, Employee, and Agent) */}
-                <button
-                  id="create-lead-trigger"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="inline-flex items-center space-x-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm ml-auto sm:ml-0"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>{currentUser.role === UserRole.Agent ? 'Refer New Customer' : 'Add New Customer'}</span>
-                </button>
-              </div>
-
-              {/* AGENT STAT CARDS INTAKE HUD */}
-              {currentUser.role === UserRole.Agent && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-slate-100 pb-5">
-                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 leading-none">Total Value Referred</div>
-                    <div className="text-lg font-bold text-slate-900 mt-1 font-mono">${totalOwnLeadVolumeByAgent.toLocaleString()}</div>
-                  </div>
-                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 leading-none">Successful Conversions</div>
-                    <div className="text-lg font-bold text-slate-900 mt-1 font-mono">
-                      {db.leads.filter(l => l.agentId === currentUser.id && l.status === LeadStatus.Approved).length} deals approved
+            currentUser.role === UserRole.Agent ? (
+              <div className="space-y-6 flex flex-col h-full text-left">
+                
+                {/* 1. AGENT PROFILE HEADER: name and mobile number at the top */}
+                <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md border border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-indigo-400">Agent Partner Profile</span>
+                      <h2 className="text-2xl font-black tracking-tight">{currentUser.name}</h2>
+                      <div className="text-xs font-semibold text-slate-300 mt-1 font-mono flex items-center space-x-2">
+                        <span>Mobile No</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        <strong className="text-indigo-300">{db.agents.find(a => a.id === currentUser.id)?.phone || currentUser.identifier}</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* SEARCH & FILTERS CONTROLS */}
-              <div className="bg-slate-50/50 border border-slate-150 p-4 rounded-xl space-y-3">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  
-                  {/* Search bar */}
-                  <div className="relative flex-1 bg-white">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                {/* 2. CUSTOMERS SECTION: Customer list and search option below, nothing else */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="text-base font-bold text-slate-900 tracking-tight">Customers</h3>
+                    <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-bold font-mono">
+                      {processedLeads.length} Referred
+                    </span>
+                  </div>
+
+                  {/* Search Option */}
+                  <div className="relative bg-white shadow-sm rounded-xl">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <Search className="w-4 h-4" />
                     </span>
                     <input
-                      id="lead-search-input"
+                      id="agent-customer-search-input"
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search customers by name, phone core, requirements..."
-                      className="w-full text-xs pl-9 pr-3 py-2.5 border border-slate-200 bg-white text-slate-950 placeholder-slate-400 rounded-lg focus:outline-none focus:border-slate-800"
+                      placeholder="Search customers by name, phone number, service requirements..."
+                      className="w-full text-xs pl-10 pr-4 py-3 border border-slate-200 bg-white text-slate-950 placeholder-slate-400 rounded-xl focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all font-sans"
                     />
                   </div>
 
-                  {/* Status Dropdown Filter */}
-                  <div className="relative w-full sm:w-48 bg-white text-left">
-                    <select
-                      id="status-filter-select"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full text-xs font-semibold border border-slate-200 rounded-lg p-2.5 bg-white text-slate-800 focus:outline-none Focus:border-slate-800 cursor-pointer"
-                    >
-                      <option value="all">-- All Statuses ({db.leads.length}) --</option>
-                      {Object.values(LeadStatus).map(s => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Customers Cards List */}
+                  <div className="pt-2">
+                    {processedLeads.length === 0 ? (
+                      <div className="p-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl font-medium text-slate-400 text-xs">
+                        {searchQuery ? `No customers match search "${searchQuery}"` : 'No customers referred yet.'}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {processedLeads.map((item) => (
+                          <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between hover:shadow-sm transition-all space-y-4 text-left">
+                            <div className="space-y-4">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <span className="text-[9px] uppercase font-bold text-slate-450 tracking-wider">Customer Inquiry</span>
+                                  <h4 className="font-bold text-slate-900 text-sm mt-0.5">{item.customerName}</h4>
+                                  <div className="text-[10px] font-semibold text-slate-400 mt-0.5 font-mono">{item.customerPhone}</div>
+                                </div>
+                                <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusBadge(item.status)}`}>
+                                  {item.status}
+                                </span>
+                              </div>
 
-                </div>
-
-                {/* Administrative & Employee subfilters */}
-                {(currentUser.role === UserRole.Admin || currentUser.role === UserRole.Employee) && (
-                  <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-3">
-                    
-                    {/* Agent select */}
-                    <div className="flex items-center space-x-1 text-xs">
-                      <span className="text-slate-400 font-semibold font-mono">Agent Partner:</span>
-                      <select
-                        id="agent-filter-select"
-                        value={agentFilter}
-                        onChange={(e) => setAgentFilter(e.target.value)}
-                        className="font-semibold bg-white border border-slate-200 rounded-lg py-1 px-2 text-slate-700 text-xs focus:outline-none cursor-pointer"
-                      >
-                        <option value="all">All Referrals</option>
-                        <option value="direct">Direct Traffic Only</option>
-                        {db.agents.map(a => (
-                          <option key={a.id} value={a.id}>{a.name}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                  </div>
-                )}
-
-                {/* METRICS & LIST DETAILS TOGGLE ROW */}
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-400 font-medium">
-                  <div className="flex items-center space-x-3">
-                    <span>
-                      Matching results: <span className="font-bold text-slate-800">{processedLeads.length} customers found</span>
-                    </span>
-                    {saveStatus !== 'idle' && (
-                      <span className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        saveStatus === 'saving' ? 'bg-amber-50 text-amber-800 border border-amber-200 animate-pulse' : 'bg-emerald-50 text-emerald-800 border border-emerald-250 font-semibold'
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${saveStatus === 'saving' ? 'bg-amber-600 animate-ping' : 'bg-emerald-600'}`} />
-                        <span>{saveStatus === 'saving' ? 'Saving to Engine...' : 'Engine Synced!'}</span>
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center space-x-4">
-                    {/* Export helper */}
-                    <button
-                      id="export-csv-btn"
-                      onClick={handleExportCSV}
-                      className="inline-flex items-center space-x-1 hover:text-slate-800 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Export CSV Spreadsheet</span>
-                    </button>
-
-                    {/* View style toggle */}
-                    <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5">
-                      <button
-                        onClick={() => setViewStyle('table')}
-                        className={`p-1 rounded transition-all cursor-pointer ${viewStyle === 'table' ? 'bg-slate-250 text-slate-800' : 'text-slate-450 hover:text-slate-800'}`}
-                      >
-                        <List className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setViewStyle('cards')}
-                        className={`p-1 rounded transition-all cursor-pointer ${viewStyle === 'cards' ? 'bg-slate-250 text-slate-800' : 'text-slate-450 hover:text-slate-800'}`}
-                      >
-                        <Grid className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* LIST VIEWER */}
-              <div className="flex-1 overflow-hidden">
-                {processedLeads.length === 0 ? (
-                  <div className="p-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl font-medium text-slate-400">
-                    No customers match your search filters.
-                  </div>
-                ) : viewStyle === 'table' ? (
-                  /* TABULAR LIST */
-                  <div className="overflow-x-auto border border-slate-100 rounded-xl shadow-md bg-white">
-                    <table className="min-w-[1750px] text-xs text-left border-collapse bg-white table-fixed">
-                      <thead>
-                        <tr className="bg-slate-900 border-b border-slate-800 text-[10px] font-bold text-slate-200 uppercase tracking-widest font-sans">
-                          <th className="px-3 py-3 w-16 text-center">SL No</th>
-                          <th className="px-3 py-3 w-48 cursor-pointer select-none hover:text-white" onClick={() => triggerSort('name')}>
-                            <div className="flex items-center space-x-1">
-                              <span>Customer Name</span>
-                              <ArrowUpDown className="w-3 h-3" />
-                            </div>
-                          </th>
-                          <th className="px-3 py-3 w-36">Registered Phone</th>
-                          <th className="px-3 py-3 w-36">Consumer No</th>
-                          <th className="px-3 py-3 w-52">Residential/Service Address</th>
-                          <th className="px-3 py-3 w-40">CRUX Status</th>
-                          <th className="px-3 py-3 w-48 font-semibold">Stage I - Application</th>
-                          <th className="px-3 py-3 w-64 text-indigo-200">Stage I - Reason for Pending/Not Starting</th>
-                          <th className="px-3 py-3 w-48">Stage II - Bank Loan</th>
-                          <th className="px-3 py-3 w-64 text-emerald-200">Stage II - Remarks / Pending / Rejections</th>
-                          <th className="px-3 py-3 w-40">Action Date</th>
-                          <th className="px-3 py-3 w-32">Last Updated</th>
-                          <th className="px-3 py-3 w-40">Referred Agent</th>
-                          <th className="px-3 py-3 w-28 text-right pr-4">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium text-slate-850">
-                        {processedLeads.map((item, index) => {
-                          const isReasonNeeded = isStageIReasonMissing(item);
-                          const isAgent = currentUser.role === UserRole.Agent;
-                          return (
-                            <tr key={item.id} className="hover:bg-slate-50/50 transition-all group">
-                              {/* 1. SL No */}
-                              <td className="px-3 py-2.5 text-center bg-slate-50/50 font-bold font-mono text-slate-500 text-[11px]">
-                                {index + 1}
-                              </td>
-
-                              {/* 2. Customer Name */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="font-bold text-slate-950 px-1.5 py-1 truncate leading-tight" title={item.customerName}>
-                                    {item.customerName}
+                              {/* Detailed tracking module */}
+                              <div className="bg-slate-50/80 rounded-xl p-4 space-y-3 text-[11px] border border-slate-200">
+                                <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-200/60">
+                                  <div>
+                                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Consumer No</span>
+                                    <span className="font-mono font-bold text-indigo-950 block mt-0.5">{item.consumerNo || 'CON-None'}</span>
                                   </div>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={item.customerName}
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'customerName', e.target.value)}
-                                    className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-bold text-slate-900 border border-transparent transition-all truncate"
-                                  />
-                                )}
-                              </td>
-
-                              {/* 3. Registered Phone */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="font-mono text-xs text-slate-800 px-1.5 py-1">
-                                    {item.customerPhone}
-                                  </div>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={item.customerPhone}
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'customerPhone', e.target.value)}
-                                    className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-mono text-xs border border-transparent transition-all text-slate-800"
-                                  />
-                                )}
-                              </td>
-
-                              {/* 4. Consumer No */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="font-mono text-xs text-indigo-900 font-bold px-1.5 py-1">
-                                    {item.consumerNo || <span className="text-slate-300 italic font-normal">None</span>}
-                                  </div>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={item.consumerNo || ''}
-                                    placeholder="CON-XXXXXX"
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'consumerNo', e.target.value)}
-                                    className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-mono text-xs border border-transparent transition-all text-indigo-900 font-semibold"
-                                  />
-                                )}
-                              </td>
-
-                              {/* 5. Address */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="text-xs text-slate-700 px-1.5 py-1 truncate" title={item.address}>
-                                    {item.address || <span className="text-slate-300 italic">None</span>}
-                                  </div>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={item.address || ''}
-                                    placeholder="Residence address"
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'address', e.target.value)}
-                                    className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 text-xs border border-transparent transition-all text-slate-700 font-normal"
-                                  />
-                                )}
-                              </td>
-
-                              {/* 6. CRUX Status */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1">
-                                    <span className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getCruxStatusBadge(item.cruxStatus || CruxStatus.NotStarted)}`}>
+                                  <div>
+                                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Crux Status</span>
+                                    <span className={`inline-flex items-center space-x-1 px-2.5 py-0.5 mt-1 text-[9px] uppercase font-bold rounded-full border ${getCruxStatusBadge(item.cruxStatus || CruxStatus.NotStarted)}`}>
                                       <span className={`w-1.5 h-1.5 rounded-full ${
                                         item.cruxStatus === CruxStatus.Completed ? 'bg-emerald-500' :
                                         item.cruxStatus === CruxStatus.Rejected ? 'bg-rose-500' :
@@ -758,367 +569,707 @@ export default function App() {
                                       <span>{item.cruxStatus || CruxStatus.NotStarted}</span>
                                     </span>
                                   </div>
-                                ) : (
-                                  <select
-                                    value={item.cruxStatus || CruxStatus.NotStarted}
-                                    onChange={(e) => {
-                                      const val = e.target.value as CruxStatus;
-                                      const updates: Partial<Lead> = { cruxStatus: val };
-                                      if (val === CruxStatus.Completed) {
-                                        updates.status = LeadStatus.Approved;
-                                        updates.stageIApplication = StageIApplication.ApplicationApproved;
-                                        updates.stageIIBankLoan = StageIIBankLoan.Disbursed;
-                                        if (!item.loanActionDate) {
-                                          updates.loanActionDate = new Date().toISOString().split('T')[0];
-                                        }
-                                      } else if (val === CruxStatus.Rejected) {
-                                        updates.status = LeadStatus.Rejected;
-                                        updates.stageIApplication = StageIApplication.ApplicationRejected;
-                                        updates.stageIIBankLoan = StageIIBankLoan.Rejected;
-                                      } else if (val === CruxStatus.InProgress) {
-                                        updates.status = LeadStatus.InProgress;
-                                      }
-                                      handleInlineFieldChanges(item.id, updates);
-                                    }}
-                                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
-                                  >
-                                    {Object.values(CruxStatus).map((cs) => (
-                                      <option key={cs} value={cs}>{cs}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </td>
+                                </div>
 
-                              {/* 7. Stage I - Application */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1">
-                                    <span className={`inline-flex px-2 py-0.5 text-[10px] font-bold rounded-lg border ${getStageIBadge(item.stageIApplication || StageIApplication.NotStarted)}`}>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                  <div>
+                                    <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Application Status</span>
+                                    <span className={`inline-flex px-2 py-0.5 mt-1 text-[9px] font-bold rounded-md border ${getStageIBadge(item.stageIApplication || StageIApplication.NotStarted)}`}>
                                       {item.stageIApplication || StageIApplication.NotStarted}
                                     </span>
                                   </div>
-                                ) : (
-                                  <select
-                                    value={item.stageIApplication || StageIApplication.NotStarted}
-                                    onChange={(e) => {
-                                      const val = e.target.value as StageIApplication;
-                                      const updates: Partial<Lead> = { stageIApplication: val };
-                                      if (val === StageIApplication.ApplicationApproved) {
-                                        if (item.cruxStatus !== CruxStatus.Completed) {
-                                          if (item.stageIIBankLoan === StageIIBankLoan.Disbursed || item.stageIIBankLoan === StageIIBankLoan.Sanctioned) {
-                                            updates.cruxStatus = CruxStatus.Completed;
-                                            updates.status = LeadStatus.Approved;
-                                          }
-                                        }
-                                      } else if (val === StageIApplication.ApplicationRejected) {
-                                        updates.cruxStatus = CruxStatus.Rejected;
-                                        updates.status = LeadStatus.Rejected;
-                                      }
-                                      handleInlineFieldChanges(item.id, updates);
-                                    }}
-                                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
-                                  >
-                                    {Object.values(StageIApplication).map((sa) => (
-                                      <option key={sa} value={sa}>{sa}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </td>
-
-                              {/* 8. Stage I - Reason / Pending */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1">
-                                    {item.stageIReason ? (
-                                      <div className="text-xs text-slate-600 italic leading-snug whitespace-normal max-h-12 overflow-y-auto" title={item.stageIReason}>
-                                        {item.stageIReason}
-                                      </div>
-                                    ) : (
-                                      <span className="text-slate-300 italic">-</span>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="space-y-0.5">
-                                    <input
-                                      type="text"
-                                      value={item.stageIReason || ''}
-                                      placeholder="Brief pending/not-started reasons..."
-                                      onChange={(e) => handleInlineFieldChange(item.id, 'stageIReason', e.target.value)}
-                                      className={`w-full text-xs rounded px-1.5 py-1 border transition-all focus:outline-none focus:ring-1 ${
-                                        isReasonNeeded
-                                          ? 'border-rose-400 bg-rose-50 hover:bg-rose-55 text-rose-950 font-medium placeholder-rose-300 focus:ring-rose-500'
-                                          : 'border-transparent bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-slate-900'
-                                      }`}
-                                    />
-                                    {isReasonNeeded && (
-                                      <div className="text-[9px] font-bold text-rose-600 pl-1 leading-none">
-                                        * Mandatory details needed
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </td>
-
-                              {/* 9. Stage II - Bank Loan */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1">
-                                    <span className={`inline-flex px-2 py-0.5 text-[10px] font-bold rounded-lg border ${getStageIIBadge(item.stageIIBankLoan || StageIIBankLoan.NotStarted)}`}>
+                                  <div>
+                                    <span className="text-[9px] text-slate-505 uppercase font-bold tracking-wider block">Bank Loan</span>
+                                    <span className={`inline-flex px-2 py-0.5 mt-1 text-[9px] font-bold rounded-md border ${getStageIIBadge(item.stageIIBankLoan || StageIIBankLoan.NotStarted)}`}>
                                       {item.stageIIBankLoan || StageIIBankLoan.NotStarted}
                                     </span>
                                   </div>
-                                ) : (
-                                  <select
-                                    value={item.stageIIBankLoan || StageIIBankLoan.NotStarted}
-                                    onChange={(e) => {
-                                      const val = e.target.value as StageIIBankLoan;
-                                      const updates: Partial<Lead> = { stageIIBankLoan: val };
-                                      if (val === StageIIBankLoan.Disbursed || val === StageIIBankLoan.Sanctioned) {
-                                        if (item.stageIApplication === StageIApplication.ApplicationApproved) {
-                                          updates.cruxStatus = CruxStatus.Completed;
-                                          updates.status = LeadStatus.Approved;
-                                        }
-                                        if (!item.loanActionDate) {
-                                          updates.loanActionDate = new Date().toISOString().split('T')[0];
-                                        }
-                                      } else if (val === StageIIBankLoan.Rejected) {
-                                        updates.cruxStatus = CruxStatus.Rejected;
-                                        updates.status = LeadStatus.Rejected;
-                                      }
-                                      handleInlineFieldChanges(item.id, updates);
-                                    }}
-                                    className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
-                                  >
-                                    {Object.values(StageIIBankLoan).map((sb) => (
-                                      <option key={sb} value={sb}>{sb}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </td>
+                                </div>
 
-                              {/* 10. Stage II - Remarks / Reason */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1">
-                                    {item.stageIIReason ? (
-                                      <div className="text-xs text-slate-600 italic leading-snug whitespace-normal max-h-12 overflow-y-auto" title={item.stageIIReason}>
-                                        {item.stageIIReason}
+                                {/* Reason for pending or not starting (rendered if pending or not started) */}
+                                {(!item.stageIApplication ||
+                                  item.stageIApplication === StageIApplication.NotStarted ||
+                                  item.stageIApplication === StageIApplication.DocumentsPending ||
+                                  item.stageIApplication === StageIApplication.DocumentsReceived ||
+                                  item.stageIApplication === StageIApplication.ApplicationUnderProcess ||
+                                  item.stageIApplication === StageIApplication.ApplicationSubmitted) && (
+                                  <div className="bg-rose-50/60 border border-rose-100 rounded-lg p-2.5 mt-2">
+                                    <span className="text-[9px] uppercase font-black tracking-wider block text-rose-800 font-sans">Reason for pending or not starting</span>
+                                    <p className="text-[10px] text-rose-900 mt-1 italic font-semibold leading-normal whitespace-pre-wrap font-sans">
+                                      {item.stageIReason ? `"${item.stageIReason}"` : "Awaiting detailed progress updates."}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Loan Disbursed or Rejected Alert Banner (rendered if status matches) */}
+                                {(item.stageIIBankLoan === StageIIBankLoan.Disbursed || item.stageIIBankLoan === StageIIBankLoan.Rejected) && (
+                                  <div className={`border rounded-lg p-2.5 mt-2 ${
+                                    item.stageIIBankLoan === StageIIBankLoan.Disbursed
+                                      ? "bg-emerald-50 border-emerald-150 text-emerald-950"
+                                      : "bg-rose-50 border-rose-150 text-rose-950"
+                                  }`}>
+                                    <span className={`text-[9px] uppercase font-black tracking-wider block ${
+                                      item.stageIIBankLoan === StageIIBankLoan.Disbursed ? "text-emerald-800" : "text-rose-800"
+                                    }`}>
+                                      Loan Disbursed or Rejected Detail
+                                    </span>
+                                    <div className="text-[11px] font-extrabold mt-1 block flex items-center space-x-1.5">
+                                      <span>{item.stageIIBankLoan === StageIIBankLoan.Disbursed ? "🎉 Loan Disbursed" : "❌ Loan Application Rejected"}</span>
+                                    </div>
+                                    {item.stageIIReason && (
+                                      <div className={`mt-1.5 text-[10px] border-t pt-1.5 leading-normal whitespace-pre-wrap italic opacity-90 font-medium ${
+                                        item.stageIIBankLoan === StageIIBankLoan.Disbursed ? "border-emerald-200 text-emerald-900" : "border-rose-200 text-rose-900"
+                                      }`}>
+                                        <strong>Processor Remarks:</strong> {item.stageIIReason}
                                       </div>
-                                    ) : (
-                                      <span className="text-slate-300 italic">-</span>
+                                    )}
+                                    {item.loanActionDate && (
+                                      <div className="text-[9px] mt-1 font-mono uppercase font-bold text-slate-500">
+                                        Action Date: {item.loanActionDate}
+                                      </div>
                                     )}
                                   </div>
-                                ) : (
-                                  <textarea
-                                    value={item.stageIIReason || ''}
-                                    placeholder="Disbursement conditions, rejection grounds or general remarks..."
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'stageIIReason', e.target.value)}
-                                    rows={1}
-                                    className="w-full text-xs bg-transparent hover:bg-slate-105 focus:bg-white border hover:border-slate-200 border-transparent rounded px-1.5 py-1 focus:ring-1 focus:ring-slate-900 resize-none h-7 overflow-y-auto"
-                                  />
                                 )}
-                              </td>
 
-                              {/* 11. Loan Action Date */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="px-1.5 py-1 font-mono text-xs text-slate-700">
-                                    {item.loanActionDate || <span className="text-slate-300">-</span>}
+                                {item.address && (
+                                  <div className="border-t border-slate-200 pt-2.5 mt-2">
+                                    <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Residential / Service Address</span>
+                                    <span className="text-[10px] text-slate-800 font-bold leading-relaxed block mt-1">{item.address}</span>
                                   </div>
-                                ) : (
-                                  <input
-                                    type="date"
-                                    value={item.loanActionDate || ''}
-                                    onChange={(e) => handleInlineFieldChange(item.id, 'loanActionDate', e.target.value)}
-                                    className="w-full border border-slate-200 bg-white hover:bg-slate-50 focus:bg-white rounded px-2 py-1 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 font-medium"
-                                  />
                                 )}
-                              </td>
-
-                              {/* 12. Last Updated */}
-                              <td className="px-3 py-2.5 font-mono text-[10px] text-slate-500 leading-normal font-semibold">
-                                {new Date(item.updatedAt).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}{' '}
-                                {new Date(item.updatedAt).toLocaleTimeString('en-US', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: false
-                                })}
-                              </td>
-
-                              {/* 13. Referrer Partner Assign */}
-                              <td className="px-3 py-2.5">
-                                {isAgent ? (
-                                  <div className="font-bold text-slate-700 px-1.5 py-1 text-xs">
-                                    {item.agentName || <span className="text-slate-350 font-normal">Direct</span>}
-                                  </div>
-                                ) : (
-                                  <select
-                                    value={item.agentId || ''}
-                                    onChange={(e) => {
-                                      const val = e.target.value;
-                                      const matchedAg = db.agents.find(a => a.id === val);
-                                      const updates: Partial<Lead> = {
-                                        agentId: val || undefined,
-                                        agentName: matchedAg ? matchedAg.name : undefined,
-                                        agentContact: matchedAg ? matchedAg.phone : undefined
-                                      };
-                                      handleInlineFieldChanges(item.id, updates);
-                                    }}
-                                    className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded px-1.5 py-1 text-[11px] font-bold cursor-pointer text-slate-700 font-sans"
-                                  >
-                                    <option value="">Direct / Walk-in</option>
-                                    {db.agents.map((ag) => (
-                                      <option key={ag.id} value={ag.id}>{ag.name}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </td>
-
-                              {/* 14. Actions */}
-                              <td className="px-3 py-2.5 text-right space-x-1 pr-4">
-                                <button
-                                  onClick={() => setSelectedLeadId(item.id)}
-                                  className="p-1 hover:text-slate-900 text-slate-400 hover:bg-slate-100 rounded-lg transition-all cursor-pointer inline-block"
-                                  title="View Details"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                                {!isAgent && (
-                                  <button
-                                    onClick={() => {
-                                      if (confirm(`Are you sure you want to permanently delete customer lead for "${item.customerName}"?`)) {
-                                        deleteLead(item.id, currentUser);
-                                        setDb(getDatabase());
-                                      }
-                                    }}
-                                    className="p-1 hover:text-rose-600 text-slate-400 hover:bg-rose-50 rounded-lg transition-all cursor-pointer inline-block"
-                                    title="Delete Lead"
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </button>
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  /* BENTO GRID OF DETAIL CARDS */
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[500px]">
-                    {processedLeads.map((item) => (
-                      <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between hover:shadow-sm transition-all space-y-4">
-                        <div className="space-y-4">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Customer Inquiry</span>
-                              <h4 className="font-bold text-slate-900 text-sm mt-0.5">{item.customerName}</h4>
-                              <div className="text-[10px] font-semibold text-slate-400 mt-0.5 font-mono">{item.customerPhone}</div>
+                              </div>
                             </div>
-                            <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusBadge(item.status)}`}>
-                              {item.status}
-                            </span>
-                          </div>
 
-                          <div className="grid grid-cols-2 gap-2 text-xs border-y border-slate-100 py-2.5">
-                            <div>
-                              <div className="text-slate-400 font-semibold text-[10px] uppercase">Service Sought</div>
-                              <div className="font-bold text-slate-800 truncate mt-0.5">{item.requirements}</div>
-                            </div>
-                            <div>
-                              <div className="text-slate-400 font-semibold text-[10px] uppercase">Amount Needed</div>
-                              <div className="font-bold text-slate-950 truncate mt-0.5">${item.budget.toLocaleString()}</div>
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+                              <span className="text-[10px] text-slate-400 font-bold font-mono">
+                                UPDATED: {new Date(item.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </span>
                             </div>
                           </div>
-
-                          {/* Dynamic detailed tracking states block */}
-                          <div className="bg-slate-50/80 rounded-lg p-3 space-y-2.5 text-[11px] border border-slate-150">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div>
-                                <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block">Consumer No</span>
-                                <span className="font-mono font-bold text-indigo-950 block mt-0.5">{item.consumerNo || 'CON-None'}</span>
-                              </div>
-                              <div>
-                                <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block">CRUX Status</span>
-                                <span className={`inline-flex items-center space-x-1 px-2 py-0.5 mt-0.5 text-[9px] uppercase font-bold rounded-full border ${getCruxStatusBadge(item.cruxStatus || CruxStatus.NotStarted)}`}>
-                                  <span className={`w-1 h-1 rounded-full ${
-                                    item.cruxStatus === CruxStatus.Completed ? 'bg-emerald-500' :
-                                    item.cruxStatus === CruxStatus.Rejected ? 'bg-rose-500' :
-                                    item.cruxStatus === CruxStatus.InProgress ? 'bg-indigo-500' :
-                                    item.cruxStatus === CruxStatus.OnHold ? 'bg-amber-500' : 'bg-slate-400'
-                                  }`} />
-                                  <span>{item.cruxStatus || CruxStatus.NotStarted}</span>
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2 border-t border-slate-150/60 pt-2">
-                              <div>
-                                <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Stage I - App</span>
-                                <span className={`inline-flex px-1.5 py-0.5 mt-0.5 text-[9px] rounded-md border ${getStageIBadge(item.stageIApplication || StageIApplication.NotStarted)}`}>
-                                  {item.stageIApplication || StageIApplication.NotStarted}
-                                </span>
-                                {item.stageIReason && (
-                                  <div className="text-[10px] text-rose-800 italic mt-1 leading-snug bg-rose-50/50 p-1.5 rounded border border-rose-100 font-medium">
-                                    Reason: {item.stageIReason}
-                                  </div>
-                                )}
-                              </div>
-                              <div>
-                                <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Stage II - Loan</span>
-                                <span className={`inline-flex px-1.5 py-0.5 mt-0.5 text-[9px] rounded-md border ${getStageIIBadge(item.stageIIBankLoan || StageIIBankLoan.NotStarted)}`}>
-                                  {item.stageIIBankLoan || StageIIBankLoan.NotStarted}
-                                </span>
-                                {item.stageIIReason && (
-                                  <div className="text-[10px] text-slate-700 italic mt-1 leading-snug bg-slate-100 p-1.5 rounded border border-slate-200">
-                                    Remarks: {item.stageIIReason}
-                                  </div>
-                                )}
-                                {item.loanActionDate && (
-                                  <div className="text-[9px] text-slate-500 font-mono mt-1 font-bold">
-                                    Action: {item.loanActionDate}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            {item.address && (
-                              <div className="border-t border-slate-150/60 pt-2">
-                                <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Residential/Service Address</span>
-                                <span className="text-[10px] text-slate-700 font-semibold leading-relaxed block mt-0.5">{item.address}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs mt-3">
-                          <div className="text-slate-450 font-semibold">
-                            {item.agentName ? (
-                              <span>Referred by: <strong className="text-slate-700 font-bold">{item.agentName}</strong></span>
-                            ) : (
-                              <span className="italic">Onboarded directly</span>
-                            )}
-                          </div>
-                          
-                          <button
-                            onClick={() => setSelectedLeadId(item.id)}
-                            className="inline-flex items-center space-x-1.5 py-1 px-2.5 bg-slate-900 text-white hover:bg-slate-800 font-bold text-[10px] uppercase rounded-lg cursor-pointer"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                            <span>Desk Controls</span>
-                          </button>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
 
-            </div>
+              </div>
+            ) : (
+              <div className="space-y-6 flex flex-col h-full text-left">
+                
+                {/* HEADING PANEL */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-5 gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold font-sans tracking-tight text-slate-950">Customer Inquiries Directory</h2>
+                    <p className="text-xs font-semibold text-slate-400 mt-1">
+                      {currentUser.role === UserRole.Admin && 'Admin controls: Monitor conversion cycles, delegate portfolios, update billing rates, and launch reports.'}
+                      {currentUser.role === UserRole.Employee && 'Processor controls: Review assigned applicants, upload vetting files, update stages, and write remarks.'}
+                      {currentUser.role === UserRole.Agent && 'Referral controls: Track payouts, review conversion statuses, check remarks, or submit new cases.'}
+                    </p>
+                  </div>
+
+                  {/* Submitting lead trigger button (accessible to Admin, Employee, and Agent) */}
+                  <button
+                    id="create-lead-trigger"
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="inline-flex items-center space-x-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm ml-auto sm:ml-0"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{currentUser.role === UserRole.Agent ? 'Refer New Customer' : 'Add New Customer'}</span>
+                  </button>
+                </div>
+
+                {/* SEARCH & FILTERS CONTROLS */}
+                <div className="bg-slate-50/50 border border-slate-150 p-4 rounded-xl space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    
+                    {/* Search bar */}
+                    <div className="relative flex-1 bg-white">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Search className="w-4 h-4" />
+                      </span>
+                      <input
+                        id="lead-search-input"
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search customers by name, phone core, requirements..."
+                        className="w-full text-xs pl-9 pr-3 py-2.5 border border-slate-200 bg-white text-slate-950 placeholder-slate-400 rounded-lg focus:outline-none focus:border-slate-800"
+                      />
+                    </div>
+
+                    {/* Status Dropdown Filter */}
+                    <div className="relative w-full sm:w-48 bg-white text-left">
+                      <select
+                        id="status-filter-select"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full text-xs font-semibold border border-slate-200 rounded-lg p-2.5 bg-white text-slate-800 focus:outline-none focus:border-slate-800 cursor-pointer"
+                      >
+                        <option value="all">-- All Statuses ({db.leads.length}) --</option>
+                        {Object.values(LeadStatus).map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                  </div>
+
+                  {/* Administrative & Employee subfilters */}
+                  {(currentUser.role === UserRole.Admin || currentUser.role === UserRole.Employee) && (
+                    <div className="flex flex-wrap gap-3 border-t border-slate-100 pt-3">
+                      
+                      {/* Agent select */}
+                      <div className="flex items-center space-x-1 text-xs">
+                        <span className="text-slate-400 font-semibold font-mono">Agent Partner:</span>
+                        <select
+                          id="agent-filter-select"
+                          value={agentFilter}
+                          onChange={(e) => setAgentFilter(e.target.value)}
+                          className="font-semibold bg-white border border-slate-200 rounded-lg py-1 px-2 text-slate-700 text-xs focus:outline-none cursor-pointer"
+                        >
+                          <option value="all">All Referrals</option>
+                          <option value="direct">Direct Traffic Only</option>
+                          {db.agents.map(a => (
+                            <option key={a.id} value={a.id}>{a.name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                    </div>
+                  )}
+
+                  {/* METRICS & LIST DETAILS TOGGLE ROW */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-400 font-medium">
+                    <div className="flex items-center space-x-3">
+                      <span>
+                        Matching results: <span className="font-bold text-slate-800">{processedLeads.length} customers found</span>
+                      </span>
+                      {saveStatus !== 'idle' && (
+                        <span className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          saveStatus === 'saving' ? 'bg-amber-50 text-amber-800 border border-amber-200 animate-pulse' : 'bg-emerald-50 text-emerald-800 border border-emerald-250 font-semibold'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${saveStatus === 'saving' ? 'bg-amber-600 animate-ping' : 'bg-emerald-600'}`} />
+                          <span>{saveStatus === 'saving' ? 'Saving to Engine...' : 'Engine Synced!'}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center space-x-4">
+                      {/* Export helper */}
+                      <button
+                        id="export-csv-btn"
+                        onClick={handleExportCSV}
+                        className="inline-flex items-center space-x-1 hover:text-slate-800 font-bold uppercase text-[10px] tracking-wider cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Export CSV Spreadsheet</span>
+                      </button>
+
+                      {/* View style toggle */}
+                      <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5">
+                        <button
+                          onClick={() => setViewStyle('table')}
+                          className={`p-1 rounded transition-all cursor-pointer ${viewStyle === 'table' ? 'bg-slate-250 text-slate-800' : 'text-slate-450 hover:text-slate-800'}`}
+                        >
+                          <List className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setViewStyle('cards')}
+                          className={`p-1 rounded transition-all cursor-pointer ${viewStyle === 'cards' ? 'bg-slate-250 text-slate-800' : 'text-slate-450 hover:text-slate-800'}`}
+                        >
+                          <Grid className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* LIST VIEWER */}
+                <div className="flex-1 overflow-hidden">
+                  {processedLeads.length === 0 ? (
+                    <div className="p-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl font-medium text-slate-400">
+                      No customers match your search filters.
+                    </div>
+                  ) : viewStyle === 'table' ? (
+                    /* TABULAR LIST */
+                    <div className="overflow-x-auto border border-slate-100 rounded-xl shadow-md bg-white">
+                      <table className="min-w-[1750px] text-xs text-left border-collapse bg-white table-fixed">
+                        <thead>
+                          <tr className="bg-slate-900 border-b border-slate-800 text-[10px] font-bold text-slate-200 uppercase tracking-widest font-sans">
+                            <th className="px-3 py-3 w-16 text-center">SL No</th>
+                            <th className="px-3 py-3 w-48 cursor-pointer select-none hover:text-white" onClick={() => triggerSort('name')}>
+                              <div className="flex items-center space-x-1">
+                                <span>Customer Name</span>
+                                <ArrowUpDown className="w-3 h-3" />
+                              </div>
+                            </th>
+                            <th className="px-3 py-3 w-36">Registered Phone</th>
+                            <th className="px-3 py-3 w-36">Consumer No</th>
+                            <th className="px-3 py-3 w-52">Residential/Service Address</th>
+                            <th className="px-3 py-3 w-40">CRUX Status</th>
+                            <th className="px-3 py-3 w-48 font-semibold">Stage I - Application</th>
+                            <th className="px-3 py-3 w-64 text-indigo-200">Stage I - Reason for Pending/Not Starting</th>
+                            <th className="px-3 py-3 w-48">Stage II - Bank Loan</th>
+                            <th className="px-3 py-3 w-64 text-emerald-200">Stage II - Remarks / Pending / Rejections</th>
+                            <th className="px-3 py-3 w-40">Action Date</th>
+                            <th className="px-3 py-3 w-32">Last Updated</th>
+                            <th className="px-3 py-3 w-40">Referred Agent</th>
+                            <th className="px-3 py-3 w-28 text-right pr-4">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium text-slate-850">
+                          {processedLeads.map((item, index) => {
+                            const isReasonNeeded = isStageIReasonMissing(item);
+                            const isAgent = currentUser.role === UserRole.Agent;
+                            return (
+                              <tr key={item.id} className="hover:bg-slate-50/50 transition-all group">
+                                {/* 1. SL No */}
+                                <td className="px-3 py-2.5 text-center bg-slate-50/50 font-bold font-mono text-slate-500 text-[11px]">
+                                  {index + 1}
+                                </td>
+
+                                {/* 2. Customer Name */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="font-bold text-slate-950 px-1.5 py-1 truncate leading-tight" title={item.customerName}>
+                                      {item.customerName}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={item.customerName}
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'customerName', e.target.value)}
+                                      className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-bold text-slate-900 border border-transparent transition-all truncate"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 3. Registered Phone */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="font-mono text-xs text-slate-800 px-1.5 py-1">
+                                      {item.customerPhone}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={item.customerPhone}
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'customerPhone', e.target.value)}
+                                      className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-mono text-xs border border-transparent transition-all text-slate-800"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 4. Consumer No */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="font-mono text-xs text-indigo-900 font-bold px-1.5 py-1">
+                                      {item.consumerNo || <span className="text-slate-300 italic font-normal">None</span>}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={item.consumerNo || ''}
+                                      placeholder="CON-XXXXXX"
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'consumerNo', e.target.value)}
+                                      className="w-full bg-transparent hover:bg-slate-105 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 font-mono text-xs border border-transparent transition-all text-indigo-900 font-semibold"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 5. Address */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="text-xs text-slate-700 px-1.5 py-1 truncate" title={item.address}>
+                                      {item.address || <span className="text-slate-300 italic">None</span>}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={item.address || ''}
+                                      placeholder="Residence address"
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'address', e.target.value)}
+                                      className="w-full bg-transparent hover:bg-slate-100 focus:bg-white focus:ring-1 focus:ring-slate-900 rounded px-1.5 py-1 text-xs border border-transparent transition-all text-slate-700 font-normal"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 6. CRUX Status */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1">
+                                      <span className={`inline-flex items-center space-x-1.5 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getCruxStatusBadge(item.cruxStatus || CruxStatus.NotStarted)}`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${
+                                          item.cruxStatus === CruxStatus.Completed ? 'bg-emerald-500' :
+                                          item.cruxStatus === CruxStatus.Rejected ? 'bg-rose-500' :
+                                          item.cruxStatus === CruxStatus.InProgress ? 'bg-indigo-500' :
+                                          item.cruxStatus === CruxStatus.OnHold ? 'bg-amber-500' : 'bg-slate-400'
+                                        }`} />
+                                        <span>{item.cruxStatus || CruxStatus.NotStarted}</span>
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <select
+                                      value={item.cruxStatus || CruxStatus.NotStarted}
+                                      onChange={(e) => {
+                                        const val = e.target.value as CruxStatus;
+                                        const updates: Partial<Lead> = { cruxStatus: val };
+                                        if (val === CruxStatus.Completed) {
+                                          updates.status = LeadStatus.Approved;
+                                          updates.stageIApplication = StageIApplication.ApplicationApproved;
+                                          updates.stageIIBankLoan = StageIIBankLoan.Disbursed;
+                                          if (!item.loanActionDate) {
+                                            updates.loanActionDate = new Date().toISOString().split('T')[0];
+                                          }
+                                        } else if (val === CruxStatus.Rejected) {
+                                          updates.status = LeadStatus.Rejected;
+                                          updates.stageIApplication = StageIApplication.ApplicationRejected;
+                                          updates.stageIIBankLoan = StageIIBankLoan.Rejected;
+                                        } else if (val === CruxStatus.InProgress) {
+                                          updates.status = LeadStatus.InProgress;
+                                        }
+                                        handleInlineFieldChanges(item.id, updates);
+                                      }}
+                                      className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
+                                    >
+                                      {Object.values(CruxStatus).map((cs) => (
+                                        <option key={cs} value={cs}>{cs}</option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </td>
+
+                                {/* 7. Stage I - Application */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1">
+                                      <span className={`inline-flex px-2 py-0.5 text-[10px] font-bold rounded-lg border ${getStageIBadge(item.stageIApplication || StageIApplication.NotStarted)}`}>
+                                        {item.stageIApplication || StageIApplication.NotStarted}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <select
+                                      value={item.stageIApplication || StageIApplication.NotStarted}
+                                      onChange={(e) => {
+                                        const val = e.target.value as StageIApplication;
+                                        const updates: Partial<Lead> = { stageIApplication: val };
+                                        if (val === StageIApplication.ApplicationApproved) {
+                                          if (item.cruxStatus !== CruxStatus.Completed) {
+                                            if (item.stageIIBankLoan === StageIIBankLoan.Disbursed || item.stageIIBankLoan === StageIIBankLoan.Sanctioned) {
+                                              updates.cruxStatus = CruxStatus.Completed;
+                                              updates.status = LeadStatus.Approved;
+                                            }
+                                          }
+                                        } else if (val === StageIApplication.ApplicationRejected) {
+                                          updates.cruxStatus = CruxStatus.Rejected;
+                                          updates.status = LeadStatus.Rejected;
+                                        }
+                                        handleInlineFieldChanges(item.id, updates);
+                                      }}
+                                      className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
+                                    >
+                                      {Object.values(StageIApplication).map((sa) => (
+                                        <option key={sa} value={sa}>{sa}</option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </td>
+
+                                {/* 8. Stage I - Reason / Pending */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1">
+                                      {item.stageIReason ? (
+                                        <div className="text-xs text-slate-650 italic leading-snug whitespace-normal max-h-12 overflow-y-auto" title={item.stageIReason}>
+                                          {item.stageIReason}
+                                        </div>
+                                      ) : (
+                                        <span className="text-slate-300 italic">-</span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-0.5">
+                                      <input
+                                        type="text"
+                                        value={item.stageIReason || ''}
+                                        placeholder="Brief pending/not-started reasons..."
+                                        onChange={(e) => handleInlineFieldChange(item.id, 'stageIReason', e.target.value)}
+                                        className={`w-full text-xs rounded px-1.5 py-1 border transition-all focus:outline-none focus:ring-1 ${
+                                          isReasonNeeded
+                                            ? 'border-rose-400 bg-rose-50 hover:bg-rose-55 text-rose-955 font-medium placeholder-rose-300 focus:ring-rose-500'
+                                            : 'border-transparent bg-transparent hover:bg-slate-105 focus:bg-white focus:ring-slate-900'
+                                        }`}
+                                      />
+                                      {isReasonNeeded && (
+                                        <div className="text-[9px] font-bold text-rose-600 pl-1 leading-none">
+                                          * Mandatory details needed
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </td>
+
+                                {/* 9. Stage II - Bank Loan */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1">
+                                      <span className={`inline-flex px-2 py-0.5 text-[10px] font-bold rounded-lg border ${getStageIIBadge(item.stageIIBankLoan || StageIIBankLoan.NotStarted)}`}>
+                                        {item.stageIIBankLoan || StageIIBankLoan.NotStarted}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <select
+                                      value={item.stageIIBankLoan || StageIIBankLoan.NotStarted}
+                                      onChange={(e) => {
+                                        const val = e.target.value as StageIIBankLoan;
+                                        const updates: Partial<Lead> = { stageIIBankLoan: val };
+                                        if (val === StageIIBankLoan.Disbursed || val === StageIIBankLoan.Sanctioned) {
+                                          if (item.stageIApplication === StageIApplication.ApplicationApproved) {
+                                            updates.cruxStatus = CruxStatus.Completed;
+                                            updates.status = LeadStatus.Approved;
+                                          }
+                                          if (!item.loanActionDate) {
+                                            updates.loanActionDate = new Date().toISOString().split('T')[0];
+                                          }
+                                        } else if (val === StageIIBankLoan.Rejected) {
+                                          updates.cruxStatus = CruxStatus.Rejected;
+                                          updates.status = LeadStatus.Rejected;
+                                        }
+                                        handleInlineFieldChanges(item.id, updates);
+                                      }}
+                                      className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 text-slate-800"
+                                    >
+                                      {Object.values(StageIIBankLoan).map((sb) => (
+                                        <option key={sb} value={sb}>{sb}</option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </td>
+
+                                {/* 10. Stage II - Remarks / Reason */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1">
+                                      {item.stageIIReason ? (
+                                        <div className="text-xs text-slate-650 italic leading-snug whitespace-normal max-h-12 overflow-y-auto" title={item.stageIIReason}>
+                                          {item.stageIIReason}
+                                        </div>
+                                      ) : (
+                                        <span className="text-slate-300 italic">-</span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <textarea
+                                      value={item.stageIIReason || ''}
+                                      placeholder="Disbursement conditions, rejection grounds or general remarks..."
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'stageIIReason', e.target.value)}
+                                      rows={1}
+                                      className="w-full text-xs bg-transparent hover:bg-slate-105 focus:bg-white border hover:border-slate-200 border-transparent rounded px-1.5 py-1 focus:ring-1 focus:ring-slate-900 resize-none h-7 overflow-y-auto"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 11. Loan Action Date */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="px-1.5 py-1 font-mono text-xs text-slate-700">
+                                      {item.loanActionDate || <span className="text-slate-300">-</span>}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="date"
+                                      value={item.loanActionDate || ''}
+                                      onChange={(e) => handleInlineFieldChange(item.id, 'loanActionDate', e.target.value)}
+                                      className="w-full border border-slate-200 bg-white hover:bg-slate-50 focus:bg-white rounded px-2 py-1 text-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-900 font-medium"
+                                    />
+                                  )}
+                                </td>
+
+                                {/* 12. Last Updated */}
+                                <td className="px-3 py-2.5 font-mono text-[10px] text-slate-500 leading-normal font-semibold">
+                                  {new Date(item.updatedAt).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}{' '}
+                                  {new Date(item.updatedAt).toLocaleTimeString('en-US', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false
+                                  })}
+                                </td>
+
+                                {/* 13. Referrer Partner Assign */}
+                                <td className="px-3 py-2.5">
+                                  {isAgent ? (
+                                    <div className="font-bold text-slate-700 px-1.5 py-1 text-xs">
+                                      {item.agentName || <span className="text-slate-350 font-normal">Direct</span>}
+                                    </div>
+                                  ) : (
+                                    <select
+                                      value={item.agentId || ''}
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        const matchedAg = db.agents.find(a => a.id === val);
+                                        const updates: Partial<Lead> = {
+                                          agentId: val || undefined,
+                                          agentName: matchedAg ? matchedAg.name : undefined,
+                                          agentContact: matchedAg ? matchedAg.phone : undefined
+                                        };
+                                        handleInlineFieldChanges(item.id, updates);
+                                      }}
+                                      className="w-full bg-slate-50 hover:bg-white border border-slate-200 rounded px-1.5 py-1 text-[11px] font-bold cursor-pointer text-slate-705 font-sans"
+                                    >
+                                      <option value="">Direct / Walk-in</option>
+                                      {db.agents.map((ag) => (
+                                        <option key={ag.id} value={ag.id}>{ag.name}</option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </td>
+
+                                {/* 14. Actions */}
+                                <td className="px-3 py-2.5 text-right space-x-1 pr-4">
+                                  <button
+                                    onClick={() => setSelectedLeadId(item.id)}
+                                    className="p-1 hover:text-slate-900 text-slate-400 hover:bg-slate-100 rounded-lg transition-all cursor-pointer inline-block"
+                                    title="View Details"
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </button>
+                                  {!isAgent && (
+                                    <button
+                                      onClick={() => {
+                                        if (confirm(`Are you sure you want to permanently delete customer lead for "${item.customerName}"?`)) {
+                                          deleteLead(item.id, currentUser);
+                                          setDb(getDatabase());
+                                        }
+                                      }}
+                                      className="p-1 hover:text-rose-600 text-slate-400 hover:bg-rose-50 rounded-lg transition-all cursor-pointer inline-block"
+                                      title="Delete Lead"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    /* BENTO GRID OF DETAIL CARDS */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[500px]">
+                      {processedLeads.map((item) => (
+                        <div key={item.id} className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between hover:shadow-sm transition-all space-y-4">
+                          <div className="space-y-4">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Customer Inquiry</span>
+                                <h4 className="font-bold text-slate-905 text-sm mt-0.5">{item.customerName}</h4>
+                                <div className="text-[10px] font-semibold text-slate-400 mt-0.5 font-mono">{item.customerPhone}</div>
+                              </div>
+                              <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${getStatusBadge(item.status)}`}>
+                                {item.status}
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs border-y border-slate-100 py-2.5">
+                              <div>
+                                <div className="text-slate-400 font-semibold text-[10px] uppercase">Service Sought</div>
+                                <div className="font-bold text-slate-800 truncate mt-0.5">{item.requirements}</div>
+                              </div>
+                              <div>
+                                <div className="text-slate-400 font-semibold text-[10px] uppercase">Amount Needed</div>
+                                <div className="font-bold text-slate-950 truncate mt-0.5">${item.budget.toLocaleString()}</div>
+                              </div>
+                            </div>
+
+                            {/* Dynamic detailed tracking states block */}
+                            <div className="bg-slate-50/80 rounded-lg p-3 space-y-2.5 text-[11px] border border-slate-150">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block">Consumer No</span>
+                                  <span className="font-mono font-bold text-indigo-950 block mt-0.5">{item.consumerNo || 'CON-None'}</span>
+                                </div>
+                                <div>
+                                  <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block">CRUX Status</span>
+                                  <span className={`inline-flex items-center space-x-1 px-2 py-0.5 mt-0.5 text-[9px] uppercase font-bold rounded-full border ${getCruxStatusBadge(item.cruxStatus || CruxStatus.NotStarted)}`}>
+                                    <span className={`w-1/5 h-1 rounded-full ${
+                                      item.cruxStatus === CruxStatus.Completed ? 'bg-emerald-500' :
+                                      item.cruxStatus === CruxStatus.Rejected ? 'bg-rose-500' :
+                                      item.cruxStatus === CruxStatus.InProgress ? 'bg-indigo-505' :
+                                      item.cruxStatus === CruxStatus.OnHold ? 'bg-amber-500' : 'bg-slate-400'
+                                    }`} />
+                                    <span>{item.cruxStatus || CruxStatus.NotStarted}</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2 border-t border-slate-150/60 pt-2">
+                                <div>
+                                  <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Stage I - App</span>
+                                  <span className={`inline-flex px-1.5 py-0.5 mt-0.5 text-[9px] rounded-md border ${getStageIBadge(item.stageIApplication || StageIApplication.NotStarted)}`}>
+                                    {item.stageIApplication || StageIApplication.NotStarted}
+                                  </span>
+                                  {item.stageIReason && (
+                                    <div className="text-[10px] text-rose-800 italic mt-1 leading-snug bg-rose-50/50 p-1.5 rounded border border-rose-100 font-medium">
+                                      Reason: {item.stageIReason}
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <span className="text-[9px] text-slate-505 uppercase font-bold tracking-wider block">Stage II - Loan</span>
+                                  <span className={`inline-flex px-1.5 py-0.5 mt-0.5 text-[9px] rounded-md border ${getStageIIBadge(item.stageIIBankLoan || StageIIBankLoan.NotStarted)}`}>
+                                    {item.stageIIBankLoan || StageIIBankLoan.NotStarted}
+                                  </span>
+                                  {item.stageIIReason && (
+                                    <div className="text-[10px] text-slate-700 italic mt-1 leading-snug bg-slate-100 p-1.5 rounded border border-slate-200">
+                                      Remarks: {item.stageIIReason}
+                                    </div>
+                                  )}
+                                  {item.loanActionDate && (
+                                    <div className="text-[9px] text-slate-505 font-mono mt-1 font-bold">
+                                      Action: {item.loanActionDate}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {item.address && (
+                                <div className="border-t border-slate-150/60 pt-2">
+                                  <span className="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Residential/Service Address</span>
+                                  <span className="text-[10px] text-slate-700 font-semibold leading-relaxed block mt-0.5">{item.address}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs mt-3">
+                            <div className="text-slate-450 font-semibold">
+                              {item.agentName ? (
+                                <span>Referred by: <strong className="text-slate-700 font-bold">{item.agentName}</strong></span>
+                              ) : (
+                                <span className="italic">Onboarded directly</span>
+                              )}
+                            </div>
+                            
+                            <button
+                              onClick={() => setSelectedLeadId(item.id)}
+                              className="inline-flex items-center space-x-1.5 py-1 px-2.5 bg-slate-900 text-white hover:bg-slate-800 font-bold text-[10px] uppercase rounded-lg cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Desk Controls</span>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            )
           )}
 
           {/* ADMIN MANAGEMENT TABS */}
@@ -1156,7 +1307,7 @@ export default function App() {
       {/* FOOTER */}
       <footer className="bg-white border-t border-slate-100 py-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[11px] text-slate-400 font-semibold leading-relaxed">
-          &copy; {new Date().getFullYear()} Lead Track Hub, Inc. • Private Administrative Resource Network. Authorized Personnel Session Only.
+          &copy; Sukafa Enterprise
         </div>
       </footer>
 
